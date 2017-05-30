@@ -9,43 +9,66 @@
 	2.模块卸载函数
 		module_exit宏所指定的函数
 
-内核模块的编译一般使用makefile
+内核模块的编译一般使用Makefile
 1.内核模块由一个源文件构成
-	ifneq ($(KERNELRELEASE))
-	
-	obj-m := hello.o
-	
-	else
+hello.c
+#include <linux/init.h>
+#include <linux/module.h>
 
-	KDIR := /lib/modules/2.6.18-53.el5/bulid #内核源代码的路径
-	all:
-		make -C $(KDIR) M=$(PWD) modules
+static int hello_init(void)
+{
+	printk(KERN_ALERT"Hello World!\n");
+	return 0;
+}
 
-	clean:
-		rm -f *.ko *.o *.mod.o *mod.c *.symvers
-	
-	endif
+static void hello_exit(void)
+{
+	printk(KERN_INFO"Exit");
+}
 
-M= $(PWD) 表示源文件在当前目录下面
+module_init(hello_init);
+module_exit(hello_exit);
+Makefile：
+
+ifneq ($(KERNELRELEASE),)
+
+obj-m := hello.o
+
+else
+
+KDIR := /lib/modules/$(shell uname -r)/build
+
+all:
+	make -C $(KDIR) M=$(shell pwd) modules
+clean:
+	rm -f *.ko *.o *.mod.o *mod.c *.symvers *.order
+
+endif
+
+M=$(shell pwd)  表示源文件在当前目录下面
 modules 表示编译的目标为内核模块
 obj-m 表示编译出的内核模块的名字
 
+编译完成后在当前目录下会有hello.ko的文件，使用insmod hello.ko就可以加载mod
+printk的输出是否在屏幕看见（可能）由KERN_**的宏决定，dmesg -c可以看见一个履历
+
 2.内核模块由多个源文件组成
-	ifneq ($(KERNELRELEASE))
-	
-	obj-m := hello.o           #line1
-	hello-objs :=main.o add.o  #line2 
-	else
 
-	KDIR := /lib/modules/2.6.18-53.el5/bulid #内核源代码的路径
-	all:
-		make -C $(KDIR) M=$(PWD) modules
+ifneq ($(KERNELRELEASE),)
 
-	clean:
-		rm -f *.ko *.o *.mod.o *mod.c *.symvers
-	
-	endif
+obj-m := hello.o           #line1
+hello-objs :=main.o add.o  #line2 
 
+else
+
+KDIR := /lib/modules/$(shell uname -r)/build
+
+all:
+	make -C $(KDIR) M=$(shell pwd) modules
+clean:
+	rm -f *.ko *.o *.mod.o *mod.c *.symvers *.order
+
+endif
 line1中的hello.o的"hello"需要和下面 hello-objs 的"hello"一致
 
 
@@ -55,7 +78,7 @@ line1中的hello.o的"hello"需要和下面 hello-objs 的"hello"一致
 查看 lsmod
 加载 modprobe
 
-modprobe和insmod的不同使在于它会根据文件/lib/modules/<$version>/modules.dep来查看要加载的模块，看是否有依赖与其他模块的，如果使，会加载其他模块到内核
+modprobe和insmod的不同使在于它会根据文件/lib/modules/<$version>/modules.dep来查看要加载的模块，看是否有依赖与其他模块的，如果是，会加载其他模块到内核
 
 
 许可声明
@@ -98,4 +121,6 @@ EXPORT_SYMBOL()将内核符号导出
 常见问题：
 内核模块的版本由内核代码决定，版本必须一致。否则加载的时候会报错
 uname -r 可以看见当前正在运行的内核版本
+
+在内核编译时写的Makefile可能需要写为Makefile，不能是makefile
 
