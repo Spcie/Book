@@ -55,5 +55,71 @@ Linux的设备号的申请
 
 
 Linux的设备号的释放
+设备号在不用的时候一定要释放掉
+void unregister_chrdev_region(dev_t from,unsigned count)
 
+
+设备文件创建
+1.使用mknod命令手工创建
+	mknod filename type major minor
+filename:设备文件名
+type:设备文件类型
+major:主设备号 
+minor:次设备号
+	eg: mknod seria10 c 100 0
+若设备驱动动动态申请，这不太好手动添加
+
+2.自动创建
+从from开始释放count个设备号
+
+
+
+
+3个主要的结构体
+Struct file     
+Struct inode
+Struct file_operations
+
+Struct file 代表打开的文件，每打开一次创建一次，关闭释放。
+重要参数：
+	loff_t f_pos //文件读写的位置，本质上是个unsigned int
+	struct file_operations *f_op
+
+Struct file_operations：
+
+struct file_operations mem_fops={
+	.owner = THIS_MODULE,
+	.llseek = mem_seek,
+	.read = mem_read,
+	.write = mem_write,
+	.ioctl = mem_ioctl,
+	.open = mem_open,
+	.release = mem_release,
+}
+	除了.owner其他都是函数指针。.owner是引用计数。使用变量时，在内核就会把owner加1，释放后减1 。只用在.owner为0时，设备才可以被卸载。
+	.open:在设备文件上的第一个操作,并不要求一定实现，可以在struct file_operations中直接定义为NULL，这样就一直打开成功
+	int (*open) (struct inode *, struct file *);
+	
+	.read
+	ssize_t (*read) (struct file *, char __user *, size_t, loff_t *);
+	
+	注意!!!：read和write的指正用户空间指针，不能被内核代码直接引用
+	内核提供用于访问用户空间的指针的函数；
+	int copy_from_user(void * to, const void __user * from, unsigned long n)
+		//从用户空间拷贝数据到内核空间
+	int copy_to_user(void __user *to, const void *from, unsigned long n)
+		//从内核空间拷贝数据到用户空间
+
+Struct inode 记录文件物理上的信息，它只会有一个。不会像Struct file那样有多个
+重要成员 dev_t i_rdev:设备号
+
+
+字符设备注册：
+字符设备使用struct cdev来描述，字符设备的注册可以分为如下3个步骤：
+	1.分配cdev
+	2.初始化cdev
+	3.添加cdev
+
+字符设备的注销
+int cdev_del(struct cdev *p)
 
