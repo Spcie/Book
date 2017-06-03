@@ -59,9 +59,13 @@ Linux的设备号的释放
 void unregister_chrdev_region(dev_t from,unsigned count)
 
 
-设备文件创建
-1.使用mknod命令手工创建
+
+
+设备文件创建 
+使用cat /proc/devices 可以查看已经加载的设备模块的设备号
+1.使用mknod命令手工创建 (必须在/dev 目录下面)
 	mknod filename type major minor
+ 	可以不在 /dev 目录下面 mknod /dev/filename type major minor
 filename:设备文件名
 type:设备文件类型
 major:主设备号 
@@ -122,4 +126,13 @@ Struct inode 记录文件物理上的信息，它只会有一个。不会像Stru
 
 字符设备的注销
 int cdev_del(struct cdev *p)
+
+
+
+
+常见错误
+1.insmod mem.ko时，若出现 
+insmod: ERROR: could not insert module mem.ko: Device or resource busy 
+可能是设备号已经被使用了。换一个吧
+2.cat /proc/devices 如果出现一个模块的名字是我们要加载的模块的名字但是/dev和ismod都没有这个模块可能会导致错误，应用程序打不开加载后的模块。把模块和设备文件卸载后重启也许可以解决
 
