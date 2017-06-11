@@ -92,7 +92,9 @@ info：通常为空
 udev（mdev） //这是存在与应用程序层
 eg:
 	struct class *myclass = class_create(THIS_MODULE,"my_device_driver")
+	
 	device_create(myclass,NULL,MKDEV(major_num,0),NULL,"my_device")
+
 	当驱动模块被加载时，udev(mdev)就会自动在/dev下创建my_device设备文件
 
 
