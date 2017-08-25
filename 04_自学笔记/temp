@@ -1,1 +1,11 @@
 
+树莓派禁止休眠设置
+在/etc/profile.d/下建立一个新的文件Screen.sh
+sudo vim  
+在文件内添加
+xset dpms 0 0 0  
+xset s off  
+保存后就可以了(这个是实际经验)
+网上说出来上面的办法外还需要下面的方法
+编辑/etc/lightdm/lightdm.conf找到[SeatDefaults]段下的'xserver-command',取消注释,修改为 xserver-command=X -s 0 -dpms
+但是实际操作的时候却发现根本不需要
