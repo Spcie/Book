@@ -30,3 +30,11 @@ sudo service ssh sttus
 但是重启之后它又关了。
 解决办法是将SD卡插入其他电脑，然后在boot分区建立了一个新的文件ssh，就可以了。
 但不知道为什么，总感觉用了添加ssh文件的方法后，ssh时响应似乎有点慢
+
+
+vim的配置
+vim的配置文件(全局)/etc/vim/vimrc，该文件的修改是针对所用用户的，
+vim的配置文件(用户)~/.vimrc该文件的修改是针对当前用户的
+在配置文件中加入
+syntax on " 自动语法高亮
+set number " 显示行号
