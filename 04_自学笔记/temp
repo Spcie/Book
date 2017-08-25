@@ -17,3 +17,16 @@ xset s off
 这个时候安装bc就可以了
 apt-get install bc
 据网络上说bc是个计算器，但是编译内核为什么要计算器？
+
+
+
+
+
+树莓派开启ssh服务
+有的时候树莓派是默认不开ssh
+这个时候得手动开
+sudo service ssh start
+sudo service ssh sttus
+但是重启之后它又关了。
+解决办法是将SD卡插入其他电脑，然后在boot分区建立了一个新的文件ssh，就可以了。
+但不知道为什么，总感觉用了添加ssh文件的方法后，ssh时响应似乎有点慢
