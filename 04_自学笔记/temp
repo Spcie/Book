@@ -9,3 +9,11 @@ xset s off
 网上说出来上面的办法外还需要下面的方法
 编辑/etc/lightdm/lightdm.conf找到[SeatDefaults]段下的'xserver-command',取消注释,修改为 xserver-command=X -s 0 -dpms
 但是实际操作的时候却发现根本不需要
+
+
+
+
+编译树莓派内核的时候，可能会出现-bash:bc:command not found的错误
+这个时候安装bc就可以了
+apt-get install bc
+据网络上说bc是个计算器，但是编译内核为什么要计算器？
